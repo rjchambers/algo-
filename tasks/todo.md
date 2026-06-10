@@ -267,8 +267,34 @@ or a non-price signal), not more TA on OHLCV at any timeframe. Evidence:
 
 **Commodities (GOLD/SILVER/OIL/WTICRUDE) — confirmed tradeable on HL HIP-3 builder
 dexs** (`xyz:GOLD`, `xyz:SILVER`, `xyz:BRENTOIL`, `km:USOIL`, …) but with only
-~3–5.5 months of candle history and no reachable deep-history source → backtests
-on them are single-regime noise, not validatable (see `scripts/commodity_probe.py`).
+~3–5.5 months of *HL* candle history. Resolved for backtesting via **deep daily
+history from Yahoo Finance** (`src/hl_trader/data/yahoo.py`): gold/silver/oil/S&P/
+Nasdaq from 2012, BTC 2014, ETH 2017.
+
+### 🟢 THE RESULT — cross-asset-class diversified trend system (`scripts/cta_system.py`)
+
+The one genuinely positive, robust, defensible strategy of the session — the
+managed-futures (CTA) model: multi-horizon long/SHORT trend on each asset,
+vol-targeted, risk-blended across **uncorrelated asset classes** (commodities +
+equity indices + crypto), all deployable 24/7 on Hyperliquid. ~14y deep daily data.
+
+| Portfolio | Full Sharpe | Full maxDD | OOS(24mo) Sharpe |
+|---|---|---|---|
+| Crypto-only | 0.98 | −14.5% | 0.57 |
+| Commodities-only | 0.34 | −21.9% | 1.24 |
+| Equities-only | 0.29 | −23.0% | 0.60 |
+| **ALL ASSET CLASSES** | **0.81** | **−10.5%** | **1.34** |
+
+- Average pairwise sleeve correlation **+0.14** (gold↔S&P +0.02) — true diversification.
+- All-asset book: **lowest drawdown of any class**, rolling-1y Sharpe positive in
+  **76%** of windows (median 0.54). Vol-scaled to 15%: 12.5% CAGR / 0.86 Sharpe full,
+  23% CAGR / 1.43 Sharpe OOS.
+- Honest caveats: full-sample Sharpe ~0.8 is the reliable figure (the 1.34 OOS rode a
+  strong gold run); daily Yahoo prices proxy the HL perps (basis/funding differ);
+  still needs walk-forward + testnet paper before capital. But this is a real,
+  positive, marketable edge — diversification across uncorrelated markets — not TA noise.
+- Architecture & roadmap: `docs/SYSTEM_DESIGN.md`. Evidence:
+  `output/phase2_validation/cta_cross_asset.txt`.
 
 ---
 
