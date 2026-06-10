@@ -22,17 +22,20 @@ class StubResponse:
 
 
 class StubSession:
-    def __init__(self, payload=None):
+    def __init__(self, payload=None, pages=None):
         self.payload = payload if payload is not None else {}
+        self.pages = list(pages) if pages is not None else None
         self.calls = []
 
     def post(self, url, json=None, timeout=None):
         self.calls.append({"url": url, "json": json, "timeout": timeout})
+        if self.pages is not None:
+            return StubResponse(self.pages.pop(0) if self.pages else [])
         return StubResponse(self.payload)
 
 
-def make_client(payload=None, clock=None):
-    session = StubSession(payload)
+def make_client(payload=None, clock=None, pages=None):
+    session = StubSession(payload, pages=pages)
     client = HyperliquidInfoClient(
         "https://api.hyperliquid-testnet.xyz",
         session=session,
@@ -72,6 +75,51 @@ def test_weight_budget_enforced():
         client.all_mids()
     with pytest.raises(RateBudgetExceeded):
         client.all_mids()
+
+
+def test_funding_history_paginates_past_500_cap():
+    page1 = [{"time": i, "fundingRate": "0.0001"} for i in range(500)]
+    page2 = [{"time": 500 + i, "fundingRate": "0.0001"} for i in range(3)]
+    client, session = make_client(pages=[page1, page2])
+    items = client.funding_history_all("BTC", start_ms=0, end_ms=10_000)
+    assert len(items) == 503
+    assert [c["json"]["startTime"] for c in session.calls] == [0, 500]
+    assert all(c["json"]["type"] == "fundingHistory" for c in session.calls)
+
+
+def test_pagination_short_page_stops():
+    page = [{"time": i} for i in range(10)]  # < 500: range exhausted in one page
+    client, session = make_client(pages=[page])
+    items = client.funding_history_all("BTC", start_ms=0, end_ms=10_000)
+    assert len(items) == 10
+    assert len(session.calls) == 1
+
+
+def test_pagination_filters_items_beyond_end():
+    page = [{"time": i} for i in range(500)]
+    client, _ = make_client(pages=[page])
+    items = client.funding_history_all("BTC", start_ms=0, end_ms=100)
+    assert len(items) == 100
+    assert items[-1]["time"] == 99
+
+
+def test_pagination_stuck_cursor_terminates():
+    # Misbehaving endpoint returns the identical full page forever; the cursor
+    # guard must break out instead of looping.
+    page = [{"time": i} for i in range(500)]
+    client, session = make_client(pages=[page, page, page])
+    items = client.funding_history_all("BTC", start_ms=0, end_ms=10_000)
+    assert len(session.calls) == 2  # first page + one repeat, then guard trips
+    assert len(items) == 1000
+
+
+def test_candles_all_paginates_on_open_time():
+    page1 = [{"t": i, "T": i + 1, "c": "100"} for i in range(500)]
+    page2 = [{"t": 500, "T": 501, "c": "100"}]
+    client, session = make_client(pages=[page1, page2])
+    items = client.candles_all("ETH", "1h", start_ms=0, end_ms=10_000)
+    assert len(items) == 501
+    assert session.calls[1]["json"]["req"]["startTime"] == 500
 
 
 def test_weight_window_expires():

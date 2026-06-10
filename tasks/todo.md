@@ -64,6 +64,8 @@
 - [x] REST Info: `meta`, `allMids`, `l2Book`, `clearinghouseState`, `fundingHistory`, `candleSnapshot`
 - [ ] WebSocket subscribe to trades/l2book/candles — **deferred until B0**: untestable here even mocked-end-to-end; REST covers Phase 1–2 needs
 - [x] Rate-budget awareness: weight accounting (1200/min) + meta snapshot caching (proven: `test_client.py`)
+- [x] Paginated history backfill (`funding_history_all`, `candles_all`) honoring the 500-element
+      cap, with stuck-cursor guard (proven: `test_client.py` pagination tests, 2026-06-10)
 - [ ] **Verify live** against testnet once B0 cleared (`scripts/check_testnet.py` ready to run)
 
 ### 0.5 Tests (Phase 0)
@@ -159,11 +161,18 @@ walk-forward + held-out recent period (blocked on B0).
       switch; vol-targeted combination did not (risk layering works; NOT edge evidence)
 
 ### 2.6 Real-data validation — **blocked on B0**
-- [ ] Pull 3+ years Binance 1h OHLCV + funding for BTC, ETH via loader; real HL funding via Info API
+- [ ] Pull 3+ years Binance 1h OHLCV + funding for BTC, ETH via loader; real HL funding via
+      `funding_history_all` (paginated; HL history starts ~2023)
 - [ ] Re-run both signals + combined with default params (no tuning before split discipline)
+- [ ] `funding_mr` variant A — **OI confirmation**: require open-interest percentile to confirm
+      crowding (via `metaAndAssetCtxs` snapshots / `activeAssetCtx` stream) before fading a
+      funding extreme; compare vs. baseline on identical splits
+- [ ] `funding_mr` variant B — **HL-vs-CEX funding spread**: use (HL funding − Binance funding)
+      as the percentile input to isolate HL-specific crowding from market-wide carry;
+      compare vs. baseline on identical splits
 - [ ] Walk-forward protocol: tune only on train windows; hold out most recent 6–12 months untouched
 - [ ] Sensitivity: ±50% on lookback/window/percentile params — edge must survive, not sit on a peak
-- [ ] Decision: promote/kill each signal; record in Phase 2 review with numbers
+- [ ] Decision: promote/kill each signal (and variant); record in Phase 2 review with numbers
 
 **Phase 2 review section:** _(fill after real-data validation)_
 

@@ -31,6 +31,10 @@ _DEFAULT_WEIGHTS = {
 
 META_CACHE_TTL_S = 300.0
 
+# Info time-range queries return at most this many elements per request;
+# history backfills must paginate (docs: "at most 500 elements").
+MAX_PAGE_ELEMENTS = 500
+
 
 class RateBudgetExceeded(RuntimeError):
     pass
@@ -106,3 +110,44 @@ class HyperliquidInfoClient:
     def candle_snapshot(self, coin: str, interval: str, start_ms: int, end_ms: int) -> list[dict]:
         req = {"coin": coin, "interval": interval, "startTime": start_ms, "endTime": end_ms}
         return self._info({"type": "candleSnapshot", "req": req})
+
+    # -- paginated backfills -------------------------------------------------
+    def _paginate(self, fetch_page, item_time_ms, start_ms: int, end_ms: int) -> list[dict]:
+        """Collect a full time range by advancing the start cursor page by page.
+
+        Stops on an empty or short page, when the range is covered, or if the
+        cursor fails to advance (misbehaving endpoint) — never loops forever.
+        """
+        items: list[dict] = []
+        cursor = start_ms
+        while cursor < end_ms:
+            batch = fetch_page(cursor)
+            if not batch:
+                break
+            items.extend(b for b in batch if item_time_ms(b) < end_ms)
+            last_ms = item_time_ms(batch[-1])
+            if len(batch) < MAX_PAGE_ELEMENTS or last_ms >= end_ms:
+                break
+            next_cursor = last_ms + 1
+            if next_cursor <= cursor:
+                break
+            cursor = next_cursor
+        return items
+
+    def funding_history_all(self, coin: str, start_ms: int, end_ms: int) -> list[dict]:
+        """Full funding history for [start_ms, end_ms), paginated past the 500 cap."""
+        return self._paginate(
+            lambda cursor: self.funding_history(coin, cursor, end_ms),
+            lambda item: item["time"],
+            start_ms,
+            end_ms,
+        )
+
+    def candles_all(self, coin: str, interval: str, start_ms: int, end_ms: int) -> list[dict]:
+        """Full candle history for [start_ms, end_ms), paginated past the 500 cap."""
+        return self._paginate(
+            lambda cursor: self.candle_snapshot(coin, interval, cursor, end_ms),
+            lambda item: item["t"],
+            start_ms,
+            end_ms,
+        )
