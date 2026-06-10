@@ -74,7 +74,7 @@ def test_ohlcv_caches_and_slices(tmp_path):
     arch = FakeArchive()
     v = BinanceVisionLoader(tmp_path, downloader=arch)
     v.load_ohlcv("BTCUSDT", "2024-01-01", "2024-02-29")
-    assert (tmp_path / "ohlcv_BTCUSDT.parquet").exists()
+    assert (tmp_path / "ohlcv_1h_BTCUSDT.parquet").exists()  # cache key includes interval
     # second loader hits cache (broken downloader proves no network needed)
     v2 = BinanceVisionLoader(tmp_path, downloader=lambda url: (_ for _ in ()).throw(AssertionError))
     sliced = v2.load_ohlcv("BTCUSDT", "2024-01-10", "2024-01-12")
