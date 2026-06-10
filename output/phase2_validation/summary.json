@@ -1,0 +1,426 @@
+{
+  "assets": {
+    "BTC": {
+      "window": [
+        "2023-06-01 01:00:00+00:00",
+        "2026-05-31 23:00:00+00:00"
+      ],
+      "bars": 26303,
+      "oos": {
+        "tsmom": {
+          "total_return": -0.07561232749296998,
+          "cagr": -0.07560403173463637,
+          "sharpe": -0.42320363359623847,
+          "max_drawdown": -0.17376170467998606,
+          "win_rate": 0.45634920634920634,
+          "expectancy": -3.9497244253605697,
+          "n_closing_trades": 252,
+          "turnover": 182.09529945649552,
+          "fees_paid": 7796.433233177694
+        },
+        "funding_mr": {
+          "total_return": -0.2001188592522276,
+          "cagr": -0.2000984723734578,
+          "sharpe": -2.2305500227473476,
+          "max_drawdown": -0.22033389640629794,
+          "win_rate": 0.2692307692307692,
+          "expectancy": -172.662270952866,
+          "n_closing_trades": 104,
+          "turnover": 67.81154560887764,
+          "fees_paid": 2751.554167635526
+        },
+        "funding_mr_oi": {
+          "total_return": -0.21105287404185713,
+          "cagr": -0.21103152634639277,
+          "sharpe": -2.6930977559832927,
+          "max_drawdown": -0.22494997494683025,
+          "win_rate": 0.23170731707317074,
+          "expectancy": -238.58666920546628,
+          "n_closing_trades": 82,
+          "turnover": 53.744476616094836,
+          "fees_paid": 2178.183272769928
+        },
+        "funding_mr_spread": {
+          "total_return": -0.0037990805694790852,
+          "cagr": -0.0037986477586434697,
+          "sharpe": 0.003948831719160054,
+          "max_drawdown": -0.09814453796304803,
+          "win_rate": 0.5178571428571429,
+          "expectancy": 39.313935848106475,
+          "n_closing_trades": 224,
+          "turnover": 195.7954047583943,
+          "fees_paid": 8977.81886711255
+        },
+        "combined": {
+          "total_return": -0.1374792742252967,
+          "cagr": -0.13746471372665003,
+          "sharpe": -1.6045269328591734,
+          "max_drawdown": -0.1528648008546375,
+          "win_rate": 0.3371647509578544,
+          "expectancy": -37.439027974078684,
+          "n_closing_trades": 261,
+          "turnover": 121.90441405833852,
+          "fees_paid": 5090.474910600151
+        }
+      },
+      "full": {
+        "tsmom": {
+          "total_return": -0.024255818487420422,
+          "cagr": -0.00814444107704515,
+          "sharpe": 0.017417774195804234,
+          "max_drawdown": -0.2516404179804863,
+          "win_rate": 0.4855403348554033,
+          "expectancy": 36.48048677785755,
+          "n_closing_trades": 657,
+          "turnover": 456.3116226304574,
+          "fees_paid": 21814.635383544755
+        },
+        "funding_mr": {
+          "total_return": -0.24627484875015826,
+          "cagr": -0.08986295457691762,
+          "sharpe": -0.9084046139230505,
+          "max_drawdown": -0.25123683117909634,
+          "win_rate": 0.4006849315068493,
+          "expectancy": -69.06180971795597,
+          "n_closing_trades": 292,
+          "turnover": 180.09877594775944,
+          "fees_paid": 7164.852218169695
+        },
+        "funding_mr_oi": {
+          "total_return": -0.20005842900852777,
+          "cagr": -0.07164443535929743,
+          "sharpe": -0.8301366471171748,
+          "max_drawdown": -0.2252010418881659,
+          "win_rate": 0.39461883408071746,
+          "expectancy": -73.38749799838853,
+          "n_closing_trades": 223,
+          "turnover": 135.48025143844993,
+          "fees_paid": 5747.477778094586
+        },
+        "funding_mr_spread": {
+          "total_return": -0.25132348157736883,
+          "cagr": -0.09189783560552844,
+          "sharpe": -1.522368692179905,
+          "max_drawdown": -0.2513234815773688,
+          "win_rate": 0.4523809523809524,
+          "expectancy": -84.1129725331276,
+          "n_closing_trades": 210,
+          "turnover": 206.1055000047824,
+          "fees_paid": 7253.372078094663
+        }
+      },
+      "walk_forward": {
+        "tsmom": {
+          "total_return": -0.12411139519029901,
+          "cagr": -0.06411787417090664,
+          "sharpe": -0.2924703012422195,
+          "max_drawdown": -0.3259481999600323,
+          "win_rate": NaN,
+          "expectancy": NaN,
+          "n_closing_trades": 0,
+          "turnover": 0.0,
+          "fees_paid": 0.0
+        },
+        "funding_mr": {
+          "total_return": -0.19583819850618467,
+          "cagr": -0.10326046626486807,
+          "sharpe": -0.9600053378953739,
+          "max_drawdown": -0.2785214042479284,
+          "win_rate": NaN,
+          "expectancy": NaN,
+          "n_closing_trades": 0,
+          "turnover": 0.0,
+          "fees_paid": 0.0
+        },
+        "funding_mr_spread": {
+          "total_return": -0.14028303997454117,
+          "cagr": -0.07279876821993314,
+          "sharpe": -1.2810957825344982,
+          "max_drawdown": -0.14212186143153038,
+          "win_rate": NaN,
+          "expectancy": NaN,
+          "n_closing_trades": 0,
+          "turnover": 0.0,
+          "fees_paid": 0.0
+        }
+      },
+      "sensitivity": {
+        "tsmom": {
+          "n": 9,
+          "min": -1.263200088657086,
+          "median": -0.7504067180704245,
+          "max": -0.205197242818991,
+          "frac_positive": 0.0
+        },
+        "funding_mr": {
+          "n": 9,
+          "min": -2.2305500227473476,
+          "median": -1.8360360619741285,
+          "max": -0.009052909650349078,
+          "frac_positive": 0.0
+        },
+        "funding_mr_spread": {
+          "n": 9,
+          "min": -2.107412707673835,
+          "median": 0.07298225986111082,
+          "max": 1.9066824380934786,
+          "frac_positive": 0.5555555555555556
+        }
+      },
+      "decisions": {
+        "tsmom": {
+          "verdict": "KILL",
+          "reasons": [
+            "OOS Sharpe -0.42<=0.5",
+            "OOS total -7.6%<=0",
+            "WF Sharpe -0.29<=0",
+            "sens median -0.75<=0",
+            "sens frac+ 0%<60%"
+          ]
+        },
+        "funding_mr": {
+          "verdict": "KILL",
+          "reasons": [
+            "OOS Sharpe -2.23<=0.5",
+            "OOS total -20.0%<=0",
+            "WF Sharpe -0.96<=0",
+            "sens median -1.84<=0",
+            "sens frac+ 0%<60%"
+          ]
+        },
+        "funding_mr_spread": {
+          "verdict": "KILL",
+          "reasons": [
+            "OOS Sharpe 0.00<=0.5",
+            "OOS total -0.4%<=0",
+            "WF Sharpe -1.28<=0",
+            "sens frac+ 56%<60%"
+          ]
+        },
+        "funding_mr_oi": {
+          "verdict": "KILL",
+          "reasons": [
+            "OOS Sharpe -2.69<=0.5",
+            "OOS total -21.1%<=0",
+            "WF Sharpe -0.96<=0",
+            "sens median -0.99<=0",
+            "sens frac+ 11%<60%"
+          ]
+        }
+      }
+    },
+    "ETH": {
+      "window": [
+        "2023-06-01 01:00:00+00:00",
+        "2026-05-31 23:00:00+00:00"
+      ],
+      "bars": 26303,
+      "oos": {
+        "tsmom": {
+          "total_return": 0.006390774408213229,
+          "cagr": 0.006390042625344483,
+          "sharpe": 0.11824643136617703,
+          "max_drawdown": -0.11827328905767782,
+          "win_rate": 0.4975609756097561,
+          "expectancy": 19.573017879187432,
+          "n_closing_trades": 205,
+          "turnover": 109.12850499142444,
+          "fees_paid": 4982.1804614602415
+        },
+        "funding_mr": {
+          "total_return": -0.12067962208873306,
+          "cagr": -0.12066671412410002,
+          "sharpe": -1.5147767480809788,
+          "max_drawdown": -0.1630004077146911,
+          "win_rate": 0.5,
+          "expectancy": -132.42591130325368,
+          "n_closing_trades": 82,
+          "turnover": 46.82509288353097,
+          "fees_paid": 1944.7517139603233
+        },
+        "funding_mr_oi": {
+          "total_return": -0.08642113984870015,
+          "cagr": -0.08641171457983055,
+          "sharpe": -1.2382069148683192,
+          "max_drawdown": -0.12793986558159734,
+          "win_rate": 0.5,
+          "expectancy": -125.34432026904834,
+          "n_closing_trades": 58,
+          "turnover": 33.63187171473996,
+          "fees_paid": 1441.2191720724704
+        },
+        "funding_mr_spread": {
+          "total_return": -0.09180425981920426,
+          "cagr": -0.09179427745326929,
+          "sharpe": -0.9782515970408201,
+          "max_drawdown": -0.17064619931891034,
+          "win_rate": 0.47593582887700536,
+          "expectancy": -22.901715364481724,
+          "n_closing_trades": 187,
+          "turnover": 112.3464887795988,
+          "fees_paid": 4740.94476917998
+        },
+        "combined": {
+          "total_return": -0.05514378398320385,
+          "cagr": -0.05513766655428154,
+          "sharpe": -0.6774439228403938,
+          "max_drawdown": -0.08769091857526107,
+          "win_rate": 0.4298245614035088,
+          "expectancy": -14.717155273125671,
+          "n_closing_trades": 228,
+          "turnover": 75.25326863078205,
+          "fees_paid": 3285.4258809534826
+        }
+      },
+      "full": {
+        "tsmom": {
+          "total_return": 0.14216061920195933,
+          "cagr": 0.04526297677963842,
+          "sharpe": 0.3474203668679552,
+          "max_drawdown": -0.22447061952524902,
+          "win_rate": 0.44458762886597936,
+          "expectancy": 47.51333855275252,
+          "n_closing_trades": 776,
+          "turnover": 446.8701578279382,
+          "fees_paid": 21486.73264138023
+        },
+        "funding_mr": {
+          "total_return": -0.21778475049010493,
+          "cagr": -0.07854700594556152,
+          "sharpe": -0.8222486194862328,
+          "max_drawdown": -0.2522516123806555,
+          "win_rate": 0.42410714285714285,
+          "expectancy": -85.86781088433567,
+          "n_closing_trades": 224,
+          "turnover": 110.8368540506725,
+          "fees_paid": 4622.245030102624
+        },
+        "funding_mr_oi": {
+          "total_return": -0.20280692266329292,
+          "cagr": -0.07270796087747367,
+          "sharpe": -0.8932809648710409,
+          "max_drawdown": -0.2532141621179929,
+          "win_rate": 0.3815789473684211,
+          "expectancy": -127.02693277876222,
+          "n_closing_trades": 152,
+          "turnover": 70.20153125538819,
+          "fees_paid": 2965.629727736521
+        },
+        "funding_mr_spread": {
+          "total_return": -0.21511061130951714,
+          "cagr": -0.07749906870935086,
+          "sharpe": -0.976753233370222,
+          "max_drawdown": -0.2517444803858364,
+          "win_rate": 0.5195530726256983,
+          "expectancy": -11.581914267397533,
+          "n_closing_trades": 537,
+          "turnover": 378.538512958457,
+          "fees_paid": 15205.541242308136
+        }
+      },
+      "walk_forward": {
+        "tsmom": {
+          "total_return": 0.271594555134423,
+          "cagr": 0.12766548108776177,
+          "sharpe": 0.7548675794824672,
+          "max_drawdown": -0.1678112532523947,
+          "win_rate": NaN,
+          "expectancy": NaN,
+          "n_closing_trades": 0,
+          "turnover": 0.0,
+          "fees_paid": 0.0
+        },
+        "funding_mr": {
+          "total_return": -0.10103403863687699,
+          "cagr": -0.05186760948961522,
+          "sharpe": -0.4699780023227581,
+          "max_drawdown": -0.22567030349143305,
+          "win_rate": NaN,
+          "expectancy": NaN,
+          "n_closing_trades": 0,
+          "turnover": 0.0,
+          "fees_paid": 0.0
+        },
+        "funding_mr_spread": {
+          "total_return": -0.12834949207628354,
+          "cagr": -0.06638506974103009,
+          "sharpe": -0.7860662369245327,
+          "max_drawdown": -0.17507624738946834,
+          "win_rate": NaN,
+          "expectancy": NaN,
+          "n_closing_trades": 0,
+          "turnover": 0.0,
+          "fees_paid": 0.0
+        }
+      },
+      "sensitivity": {
+        "tsmom": {
+          "n": 9,
+          "min": -0.4383218960420265,
+          "median": 0.377284988979498,
+          "max": 0.6695093869102832,
+          "frac_positive": 0.6666666666666666
+        },
+        "funding_mr": {
+          "n": 9,
+          "min": -2.5989969789686773,
+          "median": -0.5013609650751583,
+          "max": -0.1583397915854301,
+          "frac_positive": 0.0
+        },
+        "funding_mr_spread": {
+          "n": 9,
+          "min": -1.8234197822896776,
+          "median": -1.315078753049948,
+          "max": 0.5765731662173454,
+          "frac_positive": 0.1111111111111111
+        }
+      },
+      "decisions": {
+        "tsmom": {
+          "verdict": "KILL",
+          "reasons": [
+            "OOS Sharpe 0.12<=0.5"
+          ]
+        },
+        "funding_mr": {
+          "verdict": "KILL",
+          "reasons": [
+            "OOS Sharpe -1.51<=0.5",
+            "OOS total -12.1%<=0",
+            "WF Sharpe -0.47<=0",
+            "sens median -0.50<=0",
+            "sens frac+ 0%<60%"
+          ]
+        },
+        "funding_mr_spread": {
+          "verdict": "KILL",
+          "reasons": [
+            "OOS Sharpe -0.98<=0.5",
+            "OOS total -9.2%<=0",
+            "WF Sharpe -0.79<=0",
+            "sens median -1.32<=0",
+            "sens frac+ 11%<60%"
+          ]
+        },
+        "funding_mr_oi": {
+          "verdict": "KILL",
+          "reasons": [
+            "OOS Sharpe -1.24<=0.5",
+            "OOS total -8.6%<=0",
+            "WF Sharpe -0.47<=0",
+            "sens median -0.88<=0",
+            "sens frac+ 11%<60%"
+          ]
+        }
+      }
+    }
+  },
+  "thresholds": {
+    "oos_sharpe": 0.5,
+    "oos_total": 0.0,
+    "wf_sharpe": 0.0,
+    "sens_median": 0.0,
+    "sens_frac_positive": 0.6
+  }
+}

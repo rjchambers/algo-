@@ -1,0 +1,78 @@
+
+==============================================================================
+BTC: real-data window 2023-06-01 .. 2026-05-31 (26303 bars)  |  holdout = last 12mo (OOS 2025-05-31..2026-05-31)
+==============================================================================
+
+-- full sample (default params) --
+strategy                 total     cagr  sharpe    maxDD  winrate  trades  turnover
+tsmom                   -2.43%   -0.81%    0.02  -25.16%   48.55%     657     456.3
+funding_mr             -24.63%   -8.99%   -0.91  -25.12%   40.07%     292     180.1
+funding_mr_oi          -20.01%   -7.16%   -0.83  -22.52%   39.46%     223     135.5
+funding_mr_spread      -25.13%   -9.19%   -1.52  -25.13%   45.24%     210     206.1
+combined               -13.41%   -4.68%   -0.50  -20.79%   37.78%     855     376.4
+
+-- held-out OOS last 12mo (default params) --
+strategy                 total     cagr  sharpe    maxDD  winrate  trades  turnover
+tsmom                   -7.56%   -7.56%   -0.42  -17.38%   45.63%     252     182.1
+funding_mr             -20.01%  -20.01%   -2.23  -22.03%   26.92%     104      67.8
+funding_mr_oi          -21.11%  -21.10%   -2.69  -22.49%   23.17%      82      53.7
+funding_mr_spread       -0.38%   -0.38%    0.00   -9.81%   51.79%     224     195.8
+combined               -13.75%  -13.75%   -1.60  -15.29%   33.72%     261     121.9
+
+-- walk-forward (grid-search train -> apply test, concatenated OOS) --
+strategy                 total     cagr  sharpe    maxDD  winrate  trades  turnover
+tsmom                  -12.41%   -6.41%   -0.29  -32.59%     nan%       0       0.0
+funding_mr             -19.58%  -10.33%   -0.96  -27.85%     nan%       0       0.0
+funding_mr_spread      -14.03%   -7.28%   -1.28  -14.21%     nan%       0       0.0
+
+-- sensitivity +/-50% on key params (OOS Sharpe spread) --
+strategy               n     min  median     max   frac+
+tsmom                  9   -1.26   -0.75   -0.21      0%
+funding_mr             9   -2.23   -1.84   -0.01      0%
+funding_mr_spread      9   -2.11    0.07    1.91     56%
+
+-- DECISION (promote/kill) --
+tsmom                KILL      OOS Sharpe -0.42<=0.5; OOS total -7.6%<=0; WF Sharpe -0.29<=0; sens median -0.75<=0; sens frac+ 0%<60%
+funding_mr           KILL      OOS Sharpe -2.23<=0.5; OOS total -20.0%<=0; WF Sharpe -0.96<=0; sens median -1.84<=0; sens frac+ 0%<60%
+funding_mr_spread    KILL      OOS Sharpe 0.00<=0.5; OOS total -0.4%<=0; WF Sharpe -1.28<=0; sens frac+ 56%<60%
+funding_mr_oi        KILL      OOS Sharpe -2.69<=0.5; OOS total -21.1%<=0; WF Sharpe -0.96<=0; sens median -0.99<=0; sens frac+ 11%<60%
+
+==============================================================================
+ETH: real-data window 2023-06-01 .. 2026-05-31 (26303 bars)  |  holdout = last 12mo (OOS 2025-05-31..2026-05-31)
+==============================================================================
+
+-- full sample (default params) --
+strategy                 total     cagr  sharpe    maxDD  winrate  trades  turnover
+tsmom                   14.22%    4.53%    0.35  -22.45%   44.46%     776     446.9
+funding_mr             -21.78%   -7.85%   -0.82  -25.23%   42.41%     224     110.8
+funding_mr_oi          -20.28%   -7.27%   -0.89  -25.32%   38.16%     152      70.2
+funding_mr_spread      -21.51%   -7.75%   -0.98  -25.17%   51.96%     537     378.5
+combined                -2.26%   -0.76%   -0.05  -10.89%   37.50%     800     280.1
+
+-- held-out OOS last 12mo (default params) --
+strategy                 total     cagr  sharpe    maxDD  winrate  trades  turnover
+tsmom                    0.64%    0.64%    0.12  -11.83%   49.76%     205     109.1
+funding_mr             -12.07%  -12.07%   -1.51  -16.30%   50.00%      82      46.8
+funding_mr_oi           -8.64%   -8.64%   -1.24  -12.79%   50.00%      58      33.6
+funding_mr_spread       -9.18%   -9.18%   -0.98  -17.06%   47.59%     187     112.3
+combined                -5.51%   -5.51%   -0.68   -8.77%   42.98%     228      75.3
+
+-- walk-forward (grid-search train -> apply test, concatenated OOS) --
+strategy                 total     cagr  sharpe    maxDD  winrate  trades  turnover
+tsmom                   27.16%   12.77%    0.75  -16.78%     nan%       0       0.0
+funding_mr             -10.10%   -5.19%   -0.47  -22.57%     nan%       0       0.0
+funding_mr_spread      -12.83%   -6.64%   -0.79  -17.51%     nan%       0       0.0
+
+-- sensitivity +/-50% on key params (OOS Sharpe spread) --
+strategy               n     min  median     max   frac+
+tsmom                  9   -0.44    0.38    0.67     67%
+funding_mr             9   -2.60   -0.50   -0.16      0%
+funding_mr_spread      9   -1.82   -1.32    0.58     11%
+
+-- DECISION (promote/kill) --
+tsmom                KILL      OOS Sharpe 0.12<=0.5
+funding_mr           KILL      OOS Sharpe -1.51<=0.5; OOS total -12.1%<=0; WF Sharpe -0.47<=0; sens median -0.50<=0; sens frac+ 0%<60%
+funding_mr_spread    KILL      OOS Sharpe -0.98<=0.5; OOS total -9.2%<=0; WF Sharpe -0.79<=0; sens median -1.32<=0; sens frac+ 11%<60%
+funding_mr_oi        KILL      OOS Sharpe -1.24<=0.5; OOS total -8.6%<=0; WF Sharpe -0.47<=0; sens median -0.88<=0; sens frac+ 11%<60%
+
+wrote /home/user/algo-/output/phase2_validation/summary.json

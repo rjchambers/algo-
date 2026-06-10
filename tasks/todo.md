@@ -4,9 +4,13 @@
 > not planned in detail (do not build orchestration ahead of proven edge — spec §6).
 > Items are checkable. Mark `[x]` only when proven (test passed / log shown).
 >
-> **Status 2026-06-10:** Phase 0 code-complete (live gate blocked on B0);
-> Phase 1 complete and gate-proven; Phase 2 signals/allocator implemented and
-> unit-tested, real-data validation blocked on B0. 43 tests passing offline.
+> **Status 2026-06-10 (evening):** Phase 0 gate **PASSED live** (B0 cleared —
+> `check_testnet.py` + `pytest --run-live` green). Phase 1 complete and
+> gate-proven. Phase 2 signals/allocator implemented, unit-tested, and now
+> **validated on 3y of real BTC/ETH data (§2.6)** — result: **all four
+> candidate strategies KILLED** (no edge survives held-out + walk-forward +
+> sensitivity). 60 tests passing offline. No capital should be deployed: there
+> is no proven edge yet.
 
 ---
 
@@ -23,15 +27,20 @@
 
 ---
 
-## ⚠️ Active blocker
+## ✅ Resolved / ⚠️ Active blockers
 
-- **B0 — Network allowlist.** `api.hyperliquid.xyz`, `api.hyperliquid-testnet.xyz`
-  return `403 "Host not in allowlist"` from this web environment. GitHub + PyPI are
-  reachable. The Phase 0 gate ("pull live testnet data") **cannot pass here** until
-  these hosts (and `wss://api.hyperliquid.xyz/ws`) are added to the environment's
-  network policy. User has agreed to allowlist. Until then, Phase 0 connectivity
-  items are coded + unit-tested against recorded/mocked responses and verified live
-  once unblocked.
+- **B0 — Network allowlist — RESOLVED 2026-06-10.** `api.hyperliquid.xyz` and
+  `api.hyperliquid-testnet.xyz` now return 200. Phase 0 gate passed live
+  (`check_testnet.py`: 208 assets, live mids/funding; `pytest --run-live` green).
+- **B1 — No deep-history CEX feed (NEW, partial).** All CEX *REST* hosts are
+  geo-blocked (`api.binance.com` → 451) or outside the allowlist (Kraken/OKX/
+  Bybit/… → network error), and HL's own `candleSnapshot` only retains ~7 months
+  of 1h candles. Worked around for crypto majors via the reachable **Binance
+  Vision static archive** (`data.binance.vision`, 2017→now) for OHLCV/funding/OI,
+  plus live HL `fundingHistory` (2023-05→now). Still unresolved for **commodities**
+  (HL HIP-3 perps GOLD/SILVER/OIL on builder dexs `xyz`/`flx`/`km`/…): they
+  launched Dec-2025/Mar-2026 (~3–5.5 months of candles) and have no reachable
+  deep-history source, so they are **not validatable yet**.
 
 ---
 
@@ -160,21 +169,55 @@ walk-forward + held-out recent period (blocked on B0).
       synthetic-data warning. Synthetic smoke run: both single signals hit the 25% kill
       switch; vol-targeted combination did not (risk layering works; NOT edge evidence)
 
-### 2.6 Real-data validation — **blocked on B0**
-- [ ] Pull 3+ years Binance 1h OHLCV + funding for BTC, ETH via loader; real HL funding via
-      `funding_history_all` (paginated; HL history starts ~2023)
-- [ ] Re-run both signals + combined with default params (no tuning before split discipline)
-- [ ] `funding_mr` variant A — **OI confirmation**: require open-interest percentile to confirm
-      crowding (via `metaAndAssetCtxs` snapshots / `activeAssetCtx` stream) before fading a
-      funding extreme; compare vs. baseline on identical splits
-- [ ] `funding_mr` variant B — **HL-vs-CEX funding spread**: use (HL funding − Binance funding)
-      as the percentile input to isolate HL-specific crowding from market-wide carry;
-      compare vs. baseline on identical splits
-- [ ] Walk-forward protocol: tune only on train windows; hold out most recent 6–12 months untouched
-- [ ] Sensitivity: ±50% on lookback/window/percentile params — edge must survive, not sit on a peak
-- [ ] Decision: promote/kill each signal (and variant); record in Phase 2 review with numbers
+### 2.6 Real-data validation — **DONE 2026-06-10 (B0 cleared; see B1 workaround)**
+- [x] Pull 3y 1h OHLCV + funding + OI for BTC, ETH (Binance Vision archive, since
+      `api.binance.com` is geo-blocked) + real HL funding via `funding_history_all`
+      (2023-06-01 → 2026-05-31, 26,303 hourly bars/asset, 100% HL-funding coverage).
+      Consolidated fixtures committed under `tests/fixtures/real/`.
+- [x] Re-run both signals + combined with default params (no pre-split tuning)
+- [x] `funding_mr` variant A — **OI confirmation** (`FundingMROIConfirmed`): fade a
+      funding extreme only when open-interest percentile also confirms crowding
+- [x] `funding_mr` variant B — **HL-vs-CEX funding spread**: (HL − Binance) funding
+      as the percentile input
+- [x] Walk-forward (anchored grid-search train → untouched test) + held-out last 12mo
+- [x] Sensitivity: ±50% on lookback/window/percentile params
+- [x] Decision: **KILL all four** on both assets (numbers below)
 
-**Phase 2 review section:** _(fill after real-data validation)_
+**Phase 2 review (2026-06-10) — VERDICT: KILL ALL. No edge proven; deploy nothing.**
+
+Evaluated as-traded (vol-targeted through the allocator, HL costs, 25% DD kill).
+Promote gate (all must hold): held-out 12mo Sharpe > 0.5 AND OOS total > 0 AND
+walk-forward Sharpe > 0 AND ±50% sensitivity median Sharpe > 0 AND ≥60% of the
+sensitivity grid positive. Full numbers in `output/phase2_validation/summary.json`.
+
+| Asset | Strategy | OOS total | OOS Sharpe | WF Sharpe | Sens median | Verdict |
+|---|---|---|---|---|---|---|
+| BTC | tsmom            | −7.6%  | −0.42 | −0.29 | −0.75 | KILL |
+| BTC | funding_mr       | −20.0% | −2.23 | −0.96 | −1.84 | KILL |
+| BTC | funding_mr_oi    | −21.1% | −2.69 | —     | −0.99 | KILL |
+| BTC | funding_mr_spread| −0.4%  |  0.00 | −1.28 |  0.07 | KILL |
+| ETH | tsmom            | +0.6%  |  0.12 |  0.75 |  0.38 | KILL (OOS<0.5) |
+| ETH | funding_mr       | −12.1% | −1.51 | −0.47 | −0.50 | KILL |
+| ETH | funding_mr_oi    | −8.6%  | −1.24 | —     | −0.88 | KILL |
+| ETH | funding_mr_spread| −9.2%  | −0.98 | −0.79 | −1.32 | KILL |
+
+Findings:
+1. **Funding mean-reversion (and both variants) loses everywhere.** As written it
+   *shorts* crowded-long (rich-funding) regimes — i.e. it systematically fades the
+   trend during a 2023→2025 bull run, the textbook way to bleed. OI confirmation
+   and the HL-vs-CEX spread did not rescue it. The carry it collects is dwarfed by
+   adverse price moves. The thesis as implemented is wrong-signed in trends.
+2. **TSMOM is the only signal with any pulse**, and only on ETH (WF Sharpe 0.75,
+   67% of the sensitivity grid positive) — but its held-out OOS Sharpe is 0.12 and
+   it is dead on BTC. No robust, cross-asset, out-of-sample edge → KILL.
+3. **Combined book** is negative on both (−13.8% BTC, −5.5% ETH OOS): the allocator
+   correctly cut drawdowns vs. single signals, but you can't vol-target your way
+   out of negative-expectancy inputs.
+
+Decision: do **not** promote any signal to Phase 3. Risk machinery (vol target,
+kill switch, no-look-ahead) is validated and behaves correctly; the *edges* are
+not there. Next research must start from a real, tested hypothesis — not by
+tuning these until a backtest looks good (that is the overfitting trap §6 warns of).
 
 ---
 
@@ -218,8 +261,42 @@ algo-/
 
 ## Open questions
 
-- **OQ1:** Once allowlisted, do you want me to provision the **testnet agent wallet key** (you create it on Hyperliquid and put it in `.env`), or should Phase 0 connectivity rely only on public read-only Info endpoints until you're ready to share a key? _(Still open — not needed until Phase 3; everything so far is read-only.)_
-- **OQ3 (new):** When B0 clears, preferred real-data depth for §2.6 — 3y (proposed) or max available?
+- **OQ1:** Provisioning the **testnet agent wallet key** — needed before Phase 3
+  paper trading. You (the human) must create the agent wallet in the Hyperliquid
+  UI and place its key in `.env`; the assistant cannot and should not create it.
+  _(Still open — gates Phase 3.)_
+- **OQ3 — ANSWERED:** §2.6 used **3y** (2023-06 → 2026-05), the common window
+  bounded by HL funding/OI start. Deeper Binance price history exists (2017+) but
+  funding/OI and HL-spread inputs don't, and identical splits across signals
+  matter more than raw length.
+- **OQ4 (new):** Research direction now that the first two edges are dead — see
+  "Path to real money" below. Needs a human decision on which hypotheses to pursue.
+
+---
+
+## Path to real money (honest roadmap — nothing here is "deploy tonight")
+
+The system is **not ready for capital** and won't be after one more session: there
+is no proven edge, and no order-placement code exists yet. Sequenced, gated:
+
+1. **Find a real edge first (Phase 2 redo).** All current signals are killed.
+   Candidate next hypotheses (each must clear the §2.6 gates on BTC/ETH/SOL before
+   anything else): (a) **trend-following done properly** — TSMOM showed the only
+   pulse; test longer-horizon breakout/Donchian with the regime filter, costs
+   honestly modelled; (b) **funding carry** (the *opposite* sign of what we built:
+   earn funding with a trend/vol filter rather than fade it); (c) **cross-sectional
+   momentum** across the liquid majors. Pre-register params; no fitting to the
+   held-out year.
+2. **Phase 3 execution (read→write).** Only after an edge promotes: signed Exchange
+   client via `hyperliquid-python-sdk`, order diffing/reconciliation, idempotent
+   cancels, position/leverage caps enforced server-side. Requires OQ1 (agent key).
+3. **Testnet paper trading.** Run the promoted strategy live on **testnet** for a
+   sustained period; reconcile fills/funding vs. backtest; recalibrate slippage.
+4. **Tiny real size.** Only then, mainnet with minimal capital and hard caps, for
+   a probationary period, monitored.
+
+Commodities (GOLD/SILVER/OIL on HL HIP-3 dexs) are deferred behind B1: too little
+history to validate. HYPE likewise has only ~7mo of HL candles (no Binance archive).
 
 ---
 

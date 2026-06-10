@@ -1,9 +1,10 @@
 # hl-trader — Hyperliquid multi-signal trading system
 
 Phased build of an automated trading system for Hyperliquid perps.
-Current status: **Phase 0 (scaffold) and Phase 1 (backtest harness) complete;
-Phase 2 (signals + allocator) implemented, awaiting real-data validation**
-(see `tasks/todo.md` for gates and evidence).
+Current status: **Phases 0–1 complete and gate-proven; Phase 2 signals validated
+on 3y of real BTC/ETH data — all candidate edges KILLED (no proven edge yet).**
+Live connectivity verified. **No capital should be deployed.** See
+`tasks/todo.md` for the §2.6 numbers and the honest path-to-real-money roadmap.
 
 ## Safety model
 
@@ -45,23 +46,37 @@ trade logs for inspection.
 src/hl_trader/
 ├── config.py                  # typed env settings, testnet default
 ├── logging_setup.py           # structlog JSON + secret redaction
-├── exchange/hyperliquid_client.py  # read-only Info client, rate-budgeted
+├── exchange/hyperliquid_client.py  # read-only Info client, rate-budgeted, 429-backoff
 ├── data/loader.py             # ccxt OHLCV/funding + parquet cache + gap checks
+├── data/binance_vision.py     # deep-history archive loader (OHLCV/funding/OI)
 ├── backtest/                  # engine, costs, portfolio, metrics
-├── signals/                   # tsmom, funding_mr (Phase 2)
+├── signals/                   # tsmom, funding_mr (+ OI-confirmed variant)
 └── allocator/                 # the single deterministic risk sizer
-scripts/                       # check_testnet, run_backtest, make_fixture
-tests/                         # unit suite + committed synthetic fixture
+scripts/                       # check_testnet, run_backtest, fetch_real_data, validate_phase2
+tests/                         # unit suite + synthetic + real (tests/fixtures/real) fixtures
 tasks/                         # todo.md (phase gates), lessons.md
 ```
 
+## Real-data validation (§2.6)
+
+```bash
+.venv/bin/python scripts/fetch_real_data.py    # build tests/fixtures/real/{BTC,ETH}_1h.parquet
+.venv/bin/python scripts/validate_phase2.py    # baseline + walk-forward + sensitivity + decisions
+```
+
+Data sources: deep OHLCV/funding/open-interest from the **Binance Vision archive**
+(`data.binance.vision`, used because `api.binance.com` is geo-blocked here) plus
+live Hyperliquid funding. Verdict (2026-06-10): **all four candidate strategies
+killed** on 3y of real BTC/ETH — see `tasks/todo.md` Phase 2 review and
+`output/phase2_validation/summary.json`.
+
 ## Known constraints
 
-- **Blocker B0:** this dev environment cannot reach `api.hyperliquid.xyz`,
-  Binance, or the HL S3 archive (403 from network policy). Everything network-
-  facing is built and unit-tested against recorded/stubbed responses; live
-  verification scripts are ready to run the moment hosts are allowlisted.
-- The committed fixture (`tests/fixtures/btc_synth_1h.csv`) is **synthetic**
-  (seeded, regenerable via `scripts/make_fixture.py`). It validates mechanics,
-  never edge. No strategy goes near real money before real-data backtests,
-  walk-forward validation, and a testnet paper-trading period.
+- **B0 (network) — resolved.** HL hosts reachable; live gate passed.
+- **B1 (deep history):** CEX REST hosts are geo-blocked/off-allowlist and HL keeps
+  only ~7mo of candles, so deep history for crypto majors comes from the Binance
+  Vision archive. **Commodities** (GOLD/SILVER/OIL on HL HIP-3 builder dexs) and
+  HYPE have too little history to validate and no reachable deep-history source.
+- The legacy fixture (`tests/fixtures/btc_synth_1h.csv`) is **synthetic** (mechanics
+  only). No strategy goes near real money before a *proven* real-data edge, Phase 3
+  execution code, and a testnet paper-trading period.
