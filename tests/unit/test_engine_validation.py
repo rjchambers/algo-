@@ -117,6 +117,34 @@ def test_stop_loss_triggers_at_stop_price():
     assert stop_trades.iloc[0]["fill_price"] == pytest.approx(90.0)  # entry 100 * (1-0.10)
 
 
+def test_take_profit_triggers_at_target_price():
+    closes = [100, 100, 130, 130]
+    df = make_df(closes)
+    df.loc[df.index[2], "high"] = 130.0  # intrabar high reaches the +20% target at 120
+    target = pd.Series(1.0, index=df.index)
+    params = EngineParams(
+        initial_cash=10_000.0, costs=NO_COSTS, rebalance_threshold=0.0, take_profit_frac=0.20
+    )
+    result = run_backtest(df, target, params)
+    tp = result.trades[result.trades["reason"] == "take_profit"]
+    assert len(tp) >= 1
+    assert tp.iloc[0]["fill_price"] == pytest.approx(120.0)  # entry 100 * (1+0.20)
+
+
+def test_take_profit_on_short_closes_on_drop():
+    closes = [100, 100, 70, 70]
+    df = make_df(closes)
+    df.loc[df.index[2], "low"] = 70.0  # short profits as price falls to the -20% target (80)
+    target = pd.Series(-1.0, index=df.index)
+    params = EngineParams(
+        initial_cash=10_000.0, costs=NO_COSTS, rebalance_threshold=0.0, take_profit_frac=0.20
+    )
+    result = run_backtest(df, target, params)
+    tp = result.trades[result.trades["reason"] == "take_profit"]
+    assert len(tp) >= 1
+    assert tp.iloc[0]["fill_price"] == pytest.approx(80.0)
+
+
 def test_kill_switch_flattens_and_stays_flat():
     closes = [100] + [60] * 5  # -40% crash through a 25% kill threshold
     df = make_df(closes)

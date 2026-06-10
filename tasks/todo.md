@@ -234,6 +234,42 @@ funding-carry-gated-by-trend on the same fixtures. Findings:
 None promoted. Real leads to validate next: proper multi-regime trend-following and
 market-neutral funding carry — pre-registered, on BTC/ETH/SOL, gates as above.
 
+**Classic-TA battery (`scripts/battery_backtest.py`, `signals/classic.py`) — leads only:**
+Tested 17 published strategies (golden/death cross ±ADX, EMA crossover/bounce, MACD,
+RSI/Bollinger/Stochastic mean-reversion, Bollinger breakout, Supertrend, multi-TF
+momentum, Bill Williams Awesome/Accelerator oscillators) plus pre-specified
+convergence combinations, all as-traded vs buy&hold on BTC/ETH.
+- **Every oscillator and mean-reversion strategy loses after costs** (Accelerator
+  Osc worst: ~770 trades, fees dominate) — matches the published literature.
+- **Only `golden_cross` / `golden_cross_adx` beat buy&hold OOS on both assets**
+  (positive through the downturn, ~half the drawdown). Indicator "convergence"
+  combos mostly cut turnover/DD, not added alpha. No strategy cleared the
+  cross-asset lead bar.
+- **Full validation of the trend lead (`scripts/validate_trend.py`): KILL.** Golden
+  cross — BTC OOS Sharpe 0.37 (<0.5); ETH OOS 0.56 but walk-forward −0.91 (tuned
+  params lose −31% OOS). Beats buy&hold and hedges drawdowns, but is NOT a robust
+  promotable standalone edge. Best use is as an anticorrelated overlay, not alpha.
+
+**Multi-timeframe leveraged system (`scripts/mtf_system.py`) — KILL.** Confluence
+of 1m/5m/15m/1h/4h trend signals (real 3y BTC 1m data, 105k 15m bars), leveraged
+long/short flips, SL/TP. Every config lost 40-50% (hit the 50% kill switch) with
+~$30k/$100k in taker fees. Lower timeframes + leverage amplify costs and losses;
+no edge to amplify. (3-asset re-confirmation of the trend lead also KILL on
+BTC/ETH/SOL — walk-forward fails on ETH/SOL.)
+
+**Overall after testing §2.6 signals + 17 classic strategies + oscillators +
+combinations + a leveraged multi-timeframe system, with full walk-forward/
+sensitivity, on BTC/ETH/SOL: NO promotable edge found.** This is the honest
+state; the next edge needs a genuinely different data source or structural
+insight (e.g. HL-native positioning/liquidation flow, cross-sectional structure,
+or a non-price signal), not more TA on OHLCV at any timeframe. Evidence:
+`output/phase2_validation/{battery_BTC_ETH_SOL,trend_validation,mtf_system_BTC}.txt`.
+
+**Commodities (GOLD/SILVER/OIL/WTICRUDE) — confirmed tradeable on HL HIP-3 builder
+dexs** (`xyz:GOLD`, `xyz:SILVER`, `xyz:BRENTOIL`, `km:USOIL`, …) but with only
+~3–5.5 months of candle history and no reachable deep-history source → backtests
+on them are single-regime noise, not validatable (see `scripts/commodity_probe.py`).
+
 ---
 
 ## Repo structure (as built; config moved inside the package)

@@ -1,0 +1,8 @@
+TREND-FOLLOWING (50/200 golden/death cross) — full validation
+
+asset   full_sh   oos_tot  oos_sh    wf_tot   wf_sh  sens_med  sens+   verdict
+BTC       -0.03      4.2%    0.37     11.8%    0.38      0.37    56%      KILL
+ETH       -0.15      6.8%    0.56    -31.2%   -0.91      0.01    67%      KILL
+SOL       -0.20      6.0%    0.51    -17.0%   -0.36      0.02    56%      KILL
+
+Promote bar: OOS Sharpe>0.5 AND OOS total>0 AND WF Sharpe>0 AND sens median>0 AND >=60% of sensitivity grid positive.

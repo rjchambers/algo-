@@ -30,6 +30,7 @@ class EngineParams:
     costs: CostParams = CostParams()
     rebalance_threshold: float = 0.02  # skip trades smaller than this fraction of equity
     stop_frac: float | None = None  # e.g. 0.05 = close if price moves 5% against entry
+    take_profit_frac: float | None = None  # e.g. 0.10 = close if price moves 10% in favour
     max_drawdown_kill: float | None = None  # e.g. 0.25 = flatten for good at -25% equity DD
 
 
@@ -103,6 +104,22 @@ def run_backtest(
                     px = fill_price(stop_px, -acct.units, params.costs)
                     fee = taker_fee(acct.units * px, params.costs)
                     acct.apply_fill(ts, -acct.units, px, fee, "stop")
+
+        # 2b) Take-profit on intrabar extremes. Stop is checked first, so when a
+        # bar's range spans both levels we conservatively assume the stop hit.
+        if params.take_profit_frac is not None and acct.units != 0:
+            if acct.units > 0:
+                tp_px = acct.avg_entry * (1 + params.take_profit_frac)
+                if highs[i] >= tp_px:
+                    px = fill_price(tp_px, -acct.units, params.costs)
+                    fee = taker_fee(acct.units * px, params.costs)
+                    acct.apply_fill(ts, -acct.units, px, fee, "take_profit")
+            else:
+                tp_px = acct.avg_entry * (1 - params.take_profit_frac)
+                if lows[i] <= tp_px:
+                    px = fill_price(tp_px, -acct.units, params.costs)
+                    fee = taker_fee(acct.units * px, params.costs)
+                    acct.apply_fill(ts, -acct.units, px, fee, "take_profit")
 
         # 3) Hourly funding accrual, marked at the bar close.
         if fundings is not None and acct.units != 0 and not np.isnan(fundings[i]):

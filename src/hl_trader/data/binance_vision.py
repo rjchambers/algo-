@@ -112,22 +112,26 @@ class BinanceVisionLoader:
     def _cache_path(self, kind: str, symbol: str) -> Path:
         return self.cache_dir / f"{kind}_{symbol}.parquet"
 
-    # -- 1h OHLCV ----------------------------------------------------------
+    # -- OHLCV (any kline interval) ----------------------------------------
     def load_ohlcv(
-        self, symbol: str, start: str, end: str, refresh: bool = False
+        self, symbol: str, start: str, end: str, interval: str = "1h", refresh: bool = False
     ) -> pd.DataFrame:
-        path = self._cache_path("ohlcv", symbol)
+        path = self._cache_path(f"ohlcv_{interval}", symbol)
         if path.exists() and not refresh:
             df = pd.read_parquet(path)
         else:
-            df = self._fetch_ohlcv(symbol, pd.Timestamp(start, tz="UTC"), pd.Timestamp(end, tz="UTC"))
+            df = self._fetch_ohlcv(
+                symbol, pd.Timestamp(start, tz="UTC"), pd.Timestamp(end, tz="UTC"), interval
+            )
             df.to_parquet(path)
         return df.loc[start:end]
 
-    def _fetch_ohlcv(self, symbol: str, start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
+    def _fetch_ohlcv(
+        self, symbol: str, start: pd.Timestamp, end: pd.Timestamp, interval: str = "1h"
+    ) -> pd.DataFrame:
         frames = []
         for ym in _months(start, end):
-            url = f"{BASE_URL}/data/spot/monthly/klines/{symbol}/1h/{symbol}-1h-{ym}.zip"
+            url = f"{BASE_URL}/data/spot/monthly/klines/{symbol}/{interval}/{symbol}-{interval}-{ym}.zip"
             blob = self._download(url)
             if blob is None:
                 _log.info("vision_missing", kind="klines", symbol=symbol, period=ym)

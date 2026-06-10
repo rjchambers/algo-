@@ -49,6 +49,19 @@
   engine stays flat for the whole run, so it permanently sidelines after one bad
   drawdown (~5pp cost on vol-targeted BTC buy&hold, and it misses every recovery).
   Add a re-entry/cooldown rule before any live deployment.
+- **2026-06-10 (night) — Multi-timeframe + leverage made it worse, decisively.**
+  Built exactly what intuition suggests "should" win: confluence of 1m/5m/15m/1h/4h
+  trend signals, leveraged long/short flips, SL/TP (`scripts/mtf_system.py`, real
+  3y BTC 1m data, 105k 15m bars). Every config lost 40-50% (hit the kill switch),
+  with **~$30k of $100k paid in taker fees alone** (2,652 trades in the lev1 case).
+  Lesson: trading costs scale with frequency and losses scale with leverage, so on
+  a no-edge signal more timeframes + leverage = faster ruin, not alpha. Lower
+  timeframes are the *hardest* place to find edge after costs, not the easiest.
+- **2026-06-10 (night) — Confirmed across 3 assets.** Re-ran the battery + trend
+  validation on BTC/ETH/SOL: still no cross-asset lead, trend-following still KILL
+  (beats buy&hold OOS on all 3 but walk-forward fails on ETH −31% / SOL −17%). A
+  result that holds on three independent assets is worth trusting; one that needs a
+  specific asset/regime is not.
 - **2026-06-10 — Synthetic fixture discipline.** The committed fixture is
   seeded synthetic data; every artifact that touches it (script output, README)
   must say loudly that results on it are mechanics checks, not edge evidence.
