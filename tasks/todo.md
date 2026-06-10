@@ -219,6 +219,21 @@ kill switch, no-look-ahead) is validated and behaves correctly; the *edges* are
 not there. Next research must start from a real, tested hypothesis — not by
 tuning these until a backtest looks good (that is the overfitting trap §6 warns of).
 
+**Exploratory follow-up (`scripts/explore_strategies.py`) — leads only, NOT validated:**
+Tested buy&hold (the real benchmark), long-only trend, Donchian breakout, and
+funding-carry-gated-by-trend on the same fixtures. Findings:
+- **The held-out 12mo was a crypto downturn** (raw buy&hold BTC −29.6%, ETH −20.6%),
+  so every long-biased strategy lost OOS. One 12-month hold-out is regime-specific;
+  real validation needs multiple regimes (longer history / multiple held-out slices).
+- **Nothing robustly beats holding.** Faint OOS pulses (carry-with-trend +2.6% BTC,
+  Donchian +4.2% ETH) don't replicate across both assets or survive full-sample.
+- **Kill switch never re-enters** (permanent flatten): costs ~5pp on vol-targeted
+  BTC buy&hold here and sidelines for good — add a re-entry rule before deployment.
+  (The larger raw-172% vs vol-targeted-44% gap is vol-targeting capping exposure by
+  design, not a bug.)
+None promoted. Real leads to validate next: proper multi-regime trend-following and
+market-neutral funding carry — pre-registered, on BTC/ETH/SOL, gates as above.
+
 ---
 
 ## Repo structure (as built; config moved inside the package)

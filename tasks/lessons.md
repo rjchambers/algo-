@@ -39,6 +39,16 @@
   out-of-sample data does. Do NOT respond by tuning these until a backtest looks
   good — that's the overfitting trap. Next edge starts from a fresh, pre-registered
   hypothesis tested on identical splits.
+- **2026-06-10 (evening) — One held-out year is a regime, not a verdict.** The
+  §2.6 hold-out (2025-06→2026-05) was a crypto downturn, so buy&hold itself lost
+  ~20-30%; every long-biased strategy looked bad OOS for that reason alone. Judge
+  signals across multiple regimes/held-out slices, and always print the buy&hold
+  benchmark next to them — "strategy lost money" is meaningless without "vs. just
+  holding, which also lost money."
+- **2026-06-10 (evening) — Kill switch has no re-entry.** Once max-DD trips, the
+  engine stays flat for the whole run, so it permanently sidelines after one bad
+  drawdown (~5pp cost on vol-targeted BTC buy&hold, and it misses every recovery).
+  Add a re-entry/cooldown rule before any live deployment.
 - **2026-06-10 — Synthetic fixture discipline.** The committed fixture is
   seeded synthetic data; every artifact that touches it (script output, README)
   must say loudly that results on it are mechanics checks, not edge evidence.
