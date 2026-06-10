@@ -31,7 +31,7 @@ OUT = ROOT / "tests" / "fixtures" / "real"  # consolidated, committed for reprod
 
 # Binance Vision spot symbols proxy HL perps (plan decision); UM futures share
 # the same symbol string for funding + metrics.
-VISION_SYMBOL = {"BTC": "BTCUSDT", "ETH": "ETHUSDT"}
+VISION_SYMBOL = {"BTC": "BTCUSDT", "ETH": "ETHUSDT", "SOL": "SOLUSDT", "BNB": "BNBUSDT"}
 
 
 def fetch_hl_funding(client: HyperliquidInfoClient, coin: str, start: str, end: str) -> pd.Series:
