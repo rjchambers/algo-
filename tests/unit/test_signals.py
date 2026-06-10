@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from hl_trader.signals.funding_mr import FundingMeanReversion
+from hl_trader.signals.funding_mr import FundingMeanReversion, FundingMROIConfirmed
 from hl_trader.signals.momentum import TimeSeriesMomentum
 
 
@@ -84,3 +84,37 @@ class TestFundingMR:
         df = make_df(np.full(n, 100.0), funding=np.full(n, 1e-5))
         t = FundingMeanReversion(window_bars=20).target(df)
         assert (t.iloc[:19] == 0.0).all()
+
+
+class TestFundingMROIConfirmed:
+    def _df(self, oi_high: bool):
+        n = 60
+        funding = np.full(n, 1e-5)
+        funding[40:50] = 5e-4  # crowded-funding block
+        df = make_df(np.full(n, 100.0), funding=funding)
+        oi = np.full(n, 100.0)
+        if oi_high:
+            oi[40:50] = 200.0  # OI also elevated during the funding extreme
+        df["open_interest"] = oi
+        return df
+
+    def test_requires_open_interest_column(self):
+        n = 60
+        funding = np.full(n, 1e-5)
+        df = make_df(np.full(n, 100.0), funding=funding)
+        with pytest.raises(ValueError, match="open_interest"):
+            FundingMROIConfirmed().target(df)
+
+    def test_fades_when_oi_confirms(self):
+        df = self._df(oi_high=True)
+        sig = FundingMROIConfirmed(window_bars=20, enter_pct=0.9, exit_pct=0.6,
+                                   oi_window_bars=20, oi_confirm_pct=0.6)
+        t = sig.target(df)
+        assert (t.iloc[41:50] == -1.0).all()
+
+    def test_suppresses_entry_when_oi_flat(self):
+        df = self._df(oi_high=False)  # funding spikes but OI does not confirm
+        sig = FundingMROIConfirmed(window_bars=20, enter_pct=0.9, exit_pct=0.6,
+                                   oi_window_bars=20, oi_confirm_pct=0.6)
+        t = sig.target(df)
+        assert (t.iloc[41:50] == 0.0).all()  # entry vetoed by flat OI

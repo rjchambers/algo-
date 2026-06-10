@@ -50,3 +50,35 @@ class FundingMeanReversion(Signal):
             else:
                 pos[i] = 0.0
         return self._validate(pd.Series(pos, index=df.index), df)
+
+
+@dataclass
+class FundingMROIConfirmed(FundingMeanReversion):
+    """§2.6 variant A: fade a funding extreme only when open interest confirms.
+
+    A rich-funding print is only treated as *crowded* positioning when open
+    interest is also at a high percentile of its own rolling window — i.e. the
+    crowd is both paying up AND large. When OI is not elevated, the funding
+    extreme is ignored (target 0 / hold per hysteresis). Requires an
+    ``open_interest`` column alongside ``funding_rate``.
+    """
+
+    oi_window_bars: int = 720
+    oi_confirm_pct: float = 0.60
+    name: str = "funding_mr_oi"
+
+    def target(self, df: pd.DataFrame) -> pd.Series:
+        if "open_interest" not in df.columns:
+            raise ValueError("funding_mr_oi requires an open_interest column")
+        base = super().target(df)
+        oi_rank = df["open_interest"].rolling(self.oi_window_bars).rank(pct=True)
+        confirmed = (oi_rank >= self.oi_confirm_pct).to_numpy()
+
+        pos = base.to_numpy().copy()
+        for i in range(1, len(pos)):
+            # If the base wants a fresh entry this bar but OI does not confirm,
+            # suppress it: hold the prior (already-confirmed) position instead.
+            entering = pos[i] != 0.0 and pos[i - 1] == 0.0
+            if entering and not confirmed[i]:
+                pos[i] = 0.0
+        return self._validate(pd.Series(pos, index=df.index), df)

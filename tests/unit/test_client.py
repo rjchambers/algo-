@@ -1,6 +1,7 @@
 import json
 
 import pytest
+import requests
 
 from hl_trader.exchange.hyperliquid_client import (
     WEIGHT_BUDGET_PER_MINUTE,
@@ -130,3 +131,70 @@ def test_weight_window_expires():
     now["t"] = 61.0
     client.all_mids()  # must not raise after the window rolls
     assert client.weight_used() == 2
+
+
+class CodedResponse:
+    def __init__(self, status, payload=None, headers=None):
+        self.status_code = status
+        self._payload = payload
+        self.headers = headers or {}
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise requests.HTTPError(f"{self.status_code}")
+
+    def json(self):
+        return self._payload
+
+
+class SequenceSession:
+    def __init__(self, responses):
+        self.responses = list(responses)
+        self.calls = []
+
+    def post(self, url, json=None, timeout=None):
+        self.calls.append({"url": url, "json": json})
+        return self.responses.pop(0)
+
+
+def test_retries_on_429_then_succeeds():
+    import requests as _rq  # noqa: F401  (ensure requests imported for HTTPError)
+
+    session = SequenceSession([
+        CodedResponse(429),
+        CodedResponse(429),
+        CodedResponse(200, {"ok": True}),
+    ])
+    slept = []
+    client = HyperliquidInfoClient(
+        "https://api.hyperliquid-testnet.xyz", session=session,
+        clock=lambda: 0.0, backoff_base_s=0.1, sleep=slept.append,
+    )
+    assert client.all_mids() == {"ok": True}
+    assert len(session.calls) == 3
+    assert slept == [0.1, 0.2]  # exponential backoff between attempts
+
+
+def test_honours_retry_after_header():
+    session = SequenceSession([
+        CodedResponse(429, headers={"Retry-After": "5"}),
+        CodedResponse(200, {"ok": True}),
+    ])
+    slept = []
+    client = HyperliquidInfoClient(
+        "https://api.hyperliquid-testnet.xyz", session=session,
+        clock=lambda: 0.0, sleep=slept.append,
+    )
+    client.all_mids()
+    assert slept == [5.0]
+
+
+def test_gives_up_after_max_retries():
+    session = SequenceSession([CodedResponse(429) for _ in range(4)])
+    client = HyperliquidInfoClient(
+        "https://api.hyperliquid-testnet.xyz", session=session,
+        clock=lambda: 0.0, max_retries=3, backoff_base_s=0.0, sleep=lambda _: None,
+    )
+    with pytest.raises(requests.HTTPError):
+        client.all_mids()
+    assert len(session.calls) == 4  # initial + 3 retries

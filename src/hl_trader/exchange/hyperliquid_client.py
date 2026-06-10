@@ -16,6 +16,11 @@ import requests
 
 from hl_trader.logging_setup import get_logger
 
+# Server-side rate limiting: even within our weight budget, bursts of paginated
+# requests can draw a 429. Retry these (and transient 5xx) with exponential
+# backoff before giving up.
+_RETRY_STATUS = {429, 500, 502, 503, 504}
+
 # Hyperliquid REST rate limit: 1200 weight/minute per IP. Info request weights
 # per docs: most info requests weight 2; l2Book/allMids weight 2; candleSnapshot 4.
 WEIGHT_BUDGET_PER_MINUTE = 1200
@@ -47,11 +52,17 @@ class HyperliquidInfoClient:
         session: requests.Session | None = None,
         timeout_s: float = 10.0,
         clock=time.monotonic,
+        max_retries: int = 5,
+        backoff_base_s: float = 1.0,
+        sleep=time.sleep,
     ):
         self.base_url = base_url.rstrip("/")
         self.session = session or requests.Session()
         self.timeout_s = timeout_s
         self._clock = clock
+        self.max_retries = max_retries
+        self.backoff_base_s = backoff_base_s
+        self._sleep = sleep
         self._weight_window: list[tuple[float, int]] = []  # (timestamp, weight)
         self._meta_cache: tuple[float, dict] | None = None
         self._log = get_logger("hl.info", base_url=self.base_url)
@@ -76,11 +87,24 @@ class HyperliquidInfoClient:
     # -- core --------------------------------------------------------------
     def _info(self, payload: dict[str, Any]) -> Any:
         request_type = payload["type"]
-        self._spend_weight(request_type)
-        resp = self.session.post(f"{self.base_url}/info", json=payload, timeout=self.timeout_s)
-        resp.raise_for_status()
-        self._log.debug("info_request", request_type=request_type, status=resp.status_code)
-        return resp.json()
+        for attempt in range(self.max_retries + 1):
+            self._spend_weight(request_type)
+            resp = self.session.post(
+                f"{self.base_url}/info", json=payload, timeout=self.timeout_s
+            )
+            if resp.status_code in _RETRY_STATUS and attempt < self.max_retries:
+                # Honour Retry-After when present, else exponential backoff.
+                retry_after = resp.headers.get("Retry-After")
+                delay = float(retry_after) if retry_after else self.backoff_base_s * 2**attempt
+                self._log.warning(
+                    "info_retry", request_type=request_type, status=resp.status_code,
+                    attempt=attempt + 1, delay_s=delay,
+                )
+                self._sleep(delay)
+                continue
+            resp.raise_for_status()
+            self._log.debug("info_request", request_type=request_type, status=resp.status_code)
+            return resp.json()
 
     # -- public read-only endpoints -----------------------------------------
     def meta(self) -> dict:
