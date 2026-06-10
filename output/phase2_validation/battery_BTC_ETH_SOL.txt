@@ -1,0 +1,71 @@
+CLASSIC STRATEGY BATTERY — honest as-traded backtest (vs buy&hold).
+Leads must clear OOS Sharpe>0.5 AND beat buy&hold OOS on EVERY asset.
+
+== BTC  (26303 bars; raw buy&hold last-12mo -29.6%) ==
+strategy              full_tot  full_sh   oos_tot  oos_sh   oos_DD  trades
+buy_hold                 38.8%     0.66    -20.1%   -1.25   -25.2%     127
+golden_cross             -4.0%    -0.03      4.2%    0.37   -13.6%      78
+golden_cross_long         6.1%     0.21      0.0%     nan     0.0%       0
+ema_crossover           -17.2%    -0.28    -10.0%   -0.43   -19.5%     322
+macd                    -24.8%    -1.31    -24.0%   -2.26   -25.3%     268
+rsi_meanrev             -22.3%    -0.88    -23.9%   -2.19   -25.2%     159
+bollinger_meanrev       -24.4%    -1.25    -22.8%   -1.69   -25.0%     337
+bollinger_breakout      -21.4%    -0.53    -18.6%   -1.25   -24.3%     375
+ema_bounce              -11.6%    -0.32    -16.1%   -1.73   -20.1%     194
+supertrend                3.3%     0.15    -19.7%   -1.37   -25.1%     208
+mtf_momentum            -15.0%    -0.57     -6.4%   -0.87   -10.9%     143
+awesome_oscillator      -20.0%    -0.56    -21.0%   -1.51   -25.1%     294
+accelerator_oscillator    -23.3%    -1.22    -25.2%   -1.77   -25.2%     672
+stoch_meanrev           -24.4%    -1.20    -24.0%   -1.67   -25.1%     459
+trend_ao_confirmed      -15.5%    -0.47     -7.0%   -0.69   -13.5%     126
+golden_cross_adx         -9.5%    -0.20      4.4%    0.47    -8.9%     118
+triple_trend_confirm    -23.5%    -1.18    -16.0%   -2.42   -16.0%     185
+mtf_supertrend          -15.6%    -0.61     -5.1%   -0.76   -10.8%     111
+
+== ETH  (26303 bars; raw buy&hold last-12mo -20.6%) ==
+strategy              full_tot  full_sh   oos_tot  oos_sh   oos_DD  trades
+buy_hold                 -3.4%     0.01     -9.2%   -0.49   -25.2%      68
+golden_cross             -7.0%    -0.15      6.8%    0.56   -11.7%      63
+golden_cross_long        -6.8%    -0.16      0.0%     nan     0.0%       0
+ema_crossover            33.4%     0.57     -1.1%    0.04   -17.5%     263
+macd                    -22.8%    -1.20    -23.8%   -1.74   -25.1%     403
+rsi_meanrev             -20.0%    -0.83    -24.4%   -2.43   -25.2%     120
+bollinger_meanrev       -23.6%    -0.85    -23.6%   -1.86   -25.4%     307
+bollinger_breakout      -21.7%    -0.67      2.0%    0.20   -14.9%     356
+ema_bounce               -2.5%    -0.02     10.5%    0.99    -5.8%     179
+supertrend              -11.4%    -0.16      9.7%    0.56   -16.4%     266
+mtf_momentum            -14.1%    -0.41     -6.2%   -0.79   -11.8%     147
+awesome_oscillator      -21.1%    -1.65     -1.2%    0.04   -22.0%     445
+accelerator_oscillator    -23.4%    -1.30    -22.3%   -1.38   -25.1%     770
+stoch_meanrev           -26.3%    -1.03    -16.0%   -1.06   -24.0%     444
+trend_ao_confirmed       -5.0%    -0.07     -1.9%   -0.14   -11.6%     100
+golden_cross_adx        -12.1%    -0.43      3.8%    0.41   -10.6%      99
+triple_trend_confirm    -17.8%    -0.63    -10.8%   -1.60   -12.3%     172
+mtf_supertrend          -10.7%    -0.31     -6.6%   -0.87   -13.1%     124
+
+== SOL  (26303 bars; raw buy&hold last-12mo -47.3%) ==
+strategy              full_tot  full_sh   oos_tot  oos_sh   oos_DD  trades
+buy_hold                 53.7%     0.85    -13.2%   -0.78   -25.1%      59
+golden_cross             -7.9%    -0.20      6.0%    0.51   -11.3%      56
+golden_cross_long        -4.0%    -0.03      0.0%     nan     0.0%       0
+ema_crossover            63.5%     0.92     -7.9%   -0.32   -23.0%     240
+macd                    -25.0%    -0.80    -19.3%   -1.34   -25.3%     412
+rsi_meanrev             -21.6%    -0.80     -6.4%   -0.48   -12.6%     158
+bollinger_meanrev       -20.6%    -1.05    -20.9%   -1.48   -24.5%     366
+bollinger_breakout      -13.1%    -0.23     -4.1%   -0.21   -17.7%     344
+ema_bounce               22.3%     0.66      0.5%    0.10   -13.0%     192
+supertrend              -17.4%    -0.25     -5.5%   -0.19   -24.3%     281
+mtf_momentum            -12.7%    -0.41     -4.9%   -0.62   -12.5%     130
+awesome_oscillator       12.6%     0.31     -2.6%   -0.11   -25.1%     219
+accelerator_oscillator    -25.0%    -1.10    -19.6%   -1.36   -25.1%     590
+stoch_meanrev           -21.0%    -0.98    -12.4%   -0.76   -18.7%     460
+trend_ao_confirmed      -15.0%    -0.42      0.5%    0.10   -11.5%     100
+golden_cross_adx          8.0%     0.26      8.6%    0.92    -7.6%      96
+triple_trend_confirm    -20.1%    -0.86     -5.6%   -0.78    -9.6%     174
+mtf_supertrend          -13.8%    -0.48     -3.8%   -0.50   -11.5%     109
+
+======================================================================
+CROSS-ASSET LEADS (OOS Sharpe>0.5 AND beats buy&hold OOS on ALL assets):
+  none. No classic strategy robustly beats holding out-of-sample.
+
+(Leads are candidates only — still require full §2.6 walk-forward + sensitivity.)

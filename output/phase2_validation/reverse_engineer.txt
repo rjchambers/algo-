@@ -1,0 +1,49 @@
+==============================================================================
+PART 1 — REVERSE-ENGINEER A WINNER (in-sample), THEN LOOK OUT-OF-SAMPLE
+==============================================================================
+searching 77 indicator/param strategies per asset...
+
+-- BTC --
+  Reverse-engineered winner (best IN-SAMPLE Sharpe): ema_x_10/400h
+    in-sample :     80.1%    1.55   -15.4%   <- looks great
+    OUT-of-sample (same strategy, untouched):     18.9%    0.97   -17.7%   <- reality
+  Fit-to-everything hindsight winner: ema_x_50/400h  full:    101.4%    1.25   -15.4%
+  (Best OOS in hindsight was a DIFFERENT strategy: ema_x_50/400h     19.5%    1.00   -12.5% — unknowable in advance.)
+
+-- ETH --
+  Reverse-engineered winner (best IN-SAMPLE Sharpe): ema_x_50/400h
+    in-sample :     55.7%    1.18   -17.5%   <- looks great
+    OUT-of-sample (same strategy, untouched):     12.6%    0.70   -17.6%   <- reality
+  Fit-to-everything hindsight winner: ema_x_50/400h  full:     58.2%    0.85   -17.6%
+  (Best OOS in hindsight was a DIFFERENT strategy: supertrend_7/4.0     52.0%    2.21   -12.7% — unknowable in advance.)
+
+-- SOL --
+  Reverse-engineered winner (best IN-SAMPLE Sharpe): ema_x_20/50h
+    in-sample :     76.2%    1.51   -12.4%   <- looks great
+    OUT-of-sample (same strategy, untouched):     -7.9%   -0.32   -23.0%   <- reality
+  Fit-to-everything hindsight winner: boll_bo_100/2.5  full:     50.7%    0.98   -18.1%
+  (Best OOS in hindsight was a DIFFERENT strategy: rsi_14/10-90      1.0%    1.18    -0.3% — unknowable in advance.)
+
+Takeaway: the strategy that wins the backtest is chosen BY the backtest;
+that is selection bias, and it does not carry forward. A 'reverse-engineered
+winner' is a description of the past, not a prediction of the future.
+
+==============================================================================
+PART 2 — THE FUNDAMENTALLY-SOUND CANDIDATE: time-series momentum (long-bias)
+==============================================================================
+Theory: TSMOM is one of the few anomalies documented across decades and asset
+classes (Moskowitz/Ooi/Pedersen 2012). Long-biased + vol-targeted to respect
+crypto's upward drift and avoid shorting bull trends.
+
+asset                    full_tot full_sh   oos_tot  oos_sh   oos_DD
+BTC    buy_hold             38.8%    0.66    -20.1%   -1.25   -25.2%
+BTC    tsmom_longbias       24.5%    0.64     -5.2%   -0.76   -11.5%
+ETH    buy_hold             -3.4%    0.01     -9.2%   -0.49   -25.2%
+ETH    tsmom_longbias       27.4%    0.77      3.9%    0.59    -9.0%
+SOL    buy_hold             53.7%    0.85    -13.2%   -0.78   -25.1%
+SOL    tsmom_longbias       23.1%    0.63     -5.9%   -0.89   -10.9%
+
+Honest read: this is risk management, not alpha. It tends to match or trail
+buy&hold in bull runs and lose less in downturns (lower drawdown). It is a
+defensible *allocation*, not a money-printer, and still must clear walk-forward
++ a testnet paper-trading period before any real capital.
